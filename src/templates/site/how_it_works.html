@@ -1,0 +1,83 @@
+{% extend "base.html" %}
+
+{% block title %}Comment ça marche — Scellio{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title is-2 has-text-centered mb-6">Comment ça marche</h1>
+    <p class="subtitle is-5 has-text-centered mb-6">
+      Deux scénarios, une même promesse : vos documents protégés à chaque étape.
+    </p>
+
+    <!-- Scénario 1 : Organisation -->
+    <h2 class="title is-3 mt-6 mb-4">Scénario 1 — Vous demandez des documents</h2>
+    <p class="is-size-5 mb-5">
+      Vous êtes un professionnel (gestionnaire, notaire, bailleur...) et vous avez besoin de recevoir
+      des pièces justificatives de la part de vos interlocuteurs.
+    </p>
+    <div class="columns is-variable is-6 mb-6">
+      <div class="column has-text-centered">
+        <div class="box">
+          <p class="title is-1 has-text-primary">1</p>
+          <h3 class="title is-5">Créez une demande</h3>
+          <p>Choisissez les types de documents requis (pièce d'identité, justificatif de domicile, etc.) depuis votre tableau de bord.</p>
+        </div>
+      </div>
+      <div class="column has-text-centered">
+        <div class="box">
+          <p class="title is-1 has-text-primary">2</p>
+          <h3 class="title is-5">Envoyez le lien</h3>
+          <p>Un lien sécurisé unique est généré. Transmettez-le par email à votre interlocuteur.</p>
+        </div>
+      </div>
+      <div class="column has-text-centered">
+        <div class="box">
+          <p class="title is-1 has-text-primary">3</p>
+          <h3 class="title is-5">Votre interlocuteur dépose</h3>
+          <p>Il ouvre le lien, dépose ses documents. Ils sont chiffrés et filigranés automatiquement.</p>
+        </div>
+      </div>
+      <div class="column has-text-centered">
+        <div class="box">
+          <p class="title is-1 has-text-primary">4</p>
+          <h3 class="title is-5">Consultez et téléchargez</h3>
+          <p>Vous accédez aux documents filigranés. Après téléchargement, ils sont supprimés du serveur.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Scénario 2 : Personnel -->
+    <h2 class="title is-3 mt-6 mb-4">Scénario 2 — Vous envoyez vos propres documents</h2>
+    <p class="is-size-5 mb-5">
+      Un organisme vous demande d'envoyer des pièces justificatives. Vous souhaitez les filigraner
+      avant de les transmettre pour vous protéger contre la fraude.
+    </p>
+    <div class="columns is-variable is-6 mb-6">
+      <div class="column has-text-centered">
+        <div class="box">
+          <p class="title is-1" style="color: var(--scellio-brick);">1</p>
+          <h3 class="title is-5">Importez votre document</h3>
+          <p>Glissez-déposez votre document sur la page. Aucune inscription requise.</p>
+        </div>
+      </div>
+      <div class="column has-text-centered">
+        <div class="box">
+          <p class="title is-1" style="color: var(--scellio-brick);">2</p>
+          <h3 class="title is-5">Choisissez votre filigrane</h3>
+          <p>Indiquez le destinataire (ex. « Remis à Agence XYZ — avril 2026 »). Le filigrane est apposé automatiquement.</p>
+        </div>
+      </div>
+      <div class="column has-text-centered">
+        <div class="box">
+          <p class="title is-1" style="color: var(--scellio-brick);">3</p>
+          <h3 class="title is-5">Téléchargez</h3>
+          <p>Récupérez votre document filigrané, prêt à être envoyé en toute sécurité.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

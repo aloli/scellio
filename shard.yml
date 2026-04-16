@@ -1,0 +1,26 @@
+name: scellio
+version: 0.1.0
+
+description: |
+  Transmission sécurisée de documents avec filigranage et stockage éphémère.
+  Vos documents scellés, transmis, puis effacés.
+
+authors:
+  - papilip <papilip@aloli.fr>
+
+license: AGPL-3.0
+
+dependencies:
+  marten:
+    github: martenframework/marten
+  marten_auth:
+    github: martenframework/marten-auth
+    version: ">= 0.2.0"
+  pg:
+    github: will/crystal-pg
+  crystal-pdf:
+    path: /Users/philippe/prod-crystal/crystal-pdf
+  crystal-watermark:
+    path: /Users/philippe/prod-crystal/crystal-watermark
+
+crystal: ">= 1.19.0"

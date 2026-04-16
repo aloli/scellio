@@ -1,0 +1,779 @@
+= Scellio — Spécifications fonctionnelles et techniques
+:author: Philippe Nénert
+:revdate: 15 avril 2026
+:revnumber: 1.0
+:lang: fr
+:toc: left
+:toclevels: 3
+:icons: font
+:sectnums:
+
+== Présentation
+
+=== Le problème
+
+Chaque jour, des entreprises et des particuliers envoient par email des documents sensibles (Kbis, pièces d'identité, RIB, attestations) pour constituer un dossier d'inscription :
+
+* Un grossiste demande un Kbis et une pièce d'identité à un futur client
+* Un bailleur demande des justificatifs à un futur locataire
+* Une administration demande des pièces à un usager
+
+Ces documents :
+
+* transitent en clair par email
+* restent indéfiniment dans les boîtes mail (piratables)
+* sont stockés dans le meilleur des cas en version papier
+* ne portent aucune traçabilité d'usage
+* peuvent être réutilisés frauduleusement en cas de fuite
+
+=== La solution
+
+**Scellio** est une plateforme de transmission sécurisée de documents administratifs avec filigranage automatique et stockage éphémère.
+
+____
+Scellio — Vos documents scellés, transmis, puis effacés.
+____
+
+L'application propose *deux espaces* complémentaires :
+
+[cols="1,2,2"]
+|===
+| Espace | Qui l'utilise | Scénario
+
+| *Organisation* | Le demandeur (grossiste, bailleur, administration) | Demande des pièces à un tiers, les reçoit filigranées
+| *Personnel* | Le particulier, l'entrepreneur | Filigrane et envoie lui-même ses pièces à un destinataire
+|===
+
+=== Scénario A — Le demandeur initie (espace Organisation)
+
+Un demandeur inscrit sur Scellio demande des documents à un tiers. Le filigrane est appliqué automatiquement.
+
+[source]
+----
+DEMANDEUR (SuperBocaux)                     DÉPOSANT (Futur client)
+        │                                          │
+   1. Crée un compte Scellio                       │
+        │                                          │
+   2. Configure une demande :                      │
+      "Kbis + pièce d'identité"                    │
+        │                                          │
+   3. Envoie la demande ──────────────────► 4. Reçoit un email avec
+        │                                     un lien sécurisé (token)
+        │                                          │
+        │                                  5. Dépose ses documents
+        │                                     via le lien
+        │                                          │
+   6. Reçoit notification ◄────────────────  Documents chiffrés
+        │                                     sur le serveur
+   7. Consulte les documents
+      filigranés automatiquement :
+      "Remis à SuperBocaux — 15/04/2026
+       Création compte fournisseur"
+        │
+   8. Télécharge / imprime en PDF
+        │
+   9. Documents supprimés
+      automatiquement du serveur
+----
+
+=== Scénario B — Le particulier initie (espace Personnel)
+
+Un particulier ou un entrepreneur veut envoyer ses propres documents filigranés à un destinataire. Pas besoin de compte.
+
+[source]
+----
+EXPÉDITEUR (Particulier)                    DESTINATAIRE (SuperBocaux)
+        │                                          │
+   1. Va sur scellio.fr/personnel                  │
+        │                                          │
+   2. Dépose son document                          │
+        │                                          │
+   3. Saisit le filigrane :                        │
+      "Remis à SuperBocaux — 15/04/2026            │
+       Création compte fournisseur"                │
+        │                                          │
+   4. Saisit l'email du destinataire               │
+        │                                          │
+   5. Scellio filigrane + envoie ──────────► 6. Reçoit un email avec
+        │                                     lien de téléchargement
+        │                                          │
+   7. Document supprimé                      8. Télécharge le PDF
+      automatiquement                           filigrané
+----
+
+=== Différences entre les deux scénarios
+
+[cols="1,2,2"]
+|===
+| | Scénario A (Organisation) | Scénario B (Personnel)
+
+| *Qui initie* | Le demandeur de pièces | La personne qui envoie ses pièces
+| *Compte requis* | Oui (payant après 17 demandes) | Non (gratuit, sans inscription)
+| *Filigrane* | Automatique (nom du demandeur + date + motif) | Saisi librement par l'expéditeur
+| *Documents demandés* | Typés et configurés (Kbis, pièce d'identité) | Libres (l'expéditeur choisit)
+| *Suivi* | Dashboard complet, historique, audit trail | Confirmation simple par email
+| *Destinataire* | Le demandeur lui-même | Un tiers désigné par l'expéditeur
+| *Stockage* | Chiffré, rétention configurable | Chiffré, supprimé après téléchargement
+|===
+
+=== Nom et identité
+
+* *Nom* : Scellio —du latin _sigillum_ (sceau) et du français _scellé_
+* *Tagline* : "Vos documents scellés, transmis, puis effacés"
+* *Domaines* : scellio.fr (principal) + scellio.eu (positionnement européen)
+* *Licence* : AGPL-3.0
+* *Organisation GitHub* : ALOLI
+
+=== Logo — concept
+
+* Un *sceau de cire* stylisé (cercle avec empreinte)
+* Intégrant une *flèche de transmission* (document en transit)
+* Palette : *bleu marine* (confiance) + *rouge brique* (sceau de cire)
+* Déclinaisons : logo complet avec tagline + logo compact pour navbar/favicon
+
+== Stack technique
+
+=== Principe absolu
+
+Tout en Crystal. Aucune dépendance vers un autre écosystème (Java, Node.js, Ruby, Python).
+
+=== Serveur
+
+* *Langage* : Crystal
+* *Framework* : Marten (sans la notion d'app —structure plate)
+* *Base de données* : PostgreSQL
+* *Filigranage PDF* : `crystal-pdf` (aloli-crystal)
+* *Chiffrement* : OpenSSL (stdlib Crystal)
+* *Emails* : Carbon (shard Crystal) ou SMTP natif
+* *Tâches planifiées* : Marten jobs (purge automatique des documents)
+
+=== Client
+
+* *CSS* : Bulma
+* *Interactions serveur* : HTMX
+* *Interactions client* : Opal
+* *Pas de* : JavaScript, React, Vue, Angular, jQuery, Node.js, build step
+
+=== Documentation et site web
+
+* *Format* : AsciiDoc
+* *Rendu* : crystal-asciidoctor (aloli-crystal)
+* *Export PDF* : crystal-asciidoctor-pdf (aloli-crystal)
+* *Site web* : intégré à l'application Marten (pages statiques rendues depuis AsciiDoc)
+
+== Internationalisation (i18n)
+
+=== Principe
+
+L'application est i18n *par défaut* dès la première ligne de code.
+Aucune chaîne de caractères en dur dans les templates ou handlers.
+
+=== Mécanisme
+
+* Fichiers de traduction YAML par langue : `config/locales/{lang}.yml`
+* Helper `t("clé")` dans les templates et handlers
+* Détection automatique de la langue via :
+** Préférence utilisateur (compte)
+** En-tête `Accept-Language` du navigateur
+** Paramètre URL (`?lang=de`)
+* Fallback : anglais → français
+
+=== Langues fournies (pays européens)
+
+[cols="1,2,1"]
+|===
+| Code | Langue | Pays principal
+
+| `fr` | Français | France, Belgique, Luxembourg, Suisse
+| `en` | English | Ireland, Malta
+| `de` | Deutsch | Germany, Austria, Luxembourg
+| `es` | Español | Spain
+| `it` | Italiano | Italy
+| `pt` | Português | Portugal
+| `nl` | Nederlands | Netherlands, Belgium
+| `pl` | Polski | Poland
+| `ro` | Română | Romania
+| `el` | Ελληνικά | Greece, Cyprus
+| `cs` | Čeština | Czech Republic
+| `hu` | Magyar | Hungary
+| `sv` | Svenska | Sweden
+| `da` | Dansk | Denmark
+| `fi` | Suomi | Finland
+| `bg` | Български | Bulgaria
+| `hr` | Hrvatski | Croatia
+| `sk` | Slovenčina | Slovakia
+| `sl` | Slovenščina | Slovenia
+| `lt` | Lietuvių | Lithuania
+| `lv` | Latviešu | Latvia
+| `et` | Eesti | Estonia
+| `ga` | Gaeilge | Ireland
+| `mt` | Malti | Malta
+|===
+
+24 langues officielles de l'Union Européenne.
+
+== Modèle de données
+
+[source,crystal]
+----
+# Organisme inscrit sur Scellio
+class Organization < Marten::Model
+  field :name, :string              # "SuperBocaux SAS"
+  field :slug, :string              # "superbocaux" (URL-friendly)
+  field :email, :string             # Email de contact
+  field :plan, :string              # "free", "starter", "pro"
+  field :requests_count, :int, default: 0  # Compteur de demandes utilisées
+  field :locale, :string, default: "fr"
+  field :created_at, :date_time, auto_now_add: true
+  field :updated_at, :date_time, auto_now: true
+end
+
+# Utilisateur d'un compte demandeur
+class User < MartenAuth::User
+  field :role, :string              # "admin", "member"
+  field :locale, :string?           # Préférence langue
+  many_to_one :organization, Organization
+end
+
+# Type de document configurable par chaque demandeur
+class DocumentType < Marten::Model
+  field :name, :string              # "Kbis", "Pièce d'identité", "RIB"...
+  field :description, :string?
+  field :is_mandatory, :bool, default: true
+  field :position, :int
+  many_to_one :organization, Organization
+end
+
+# Transmission de documents (scénario A ou B)
+class Request < Marten::Model
+  field :token, :string             # UUID unique pour le lien sécurisé
+  field :initiated_by, :string      # "organization" (scénario A) ou "individual" (scénario B)
+  field :recipient_email, :string   # Scénario A : email du déposant / Scénario B : email du destinataire
+  field :recipient_name, :string?   # Nom du destinataire
+  field :sender_email, :string?     # Scénario B uniquement : email de l'expéditeur
+  field :sender_name, :string?      # Scénario B uniquement : nom de l'expéditeur
+  field :purpose, :string           # "Création compte fournisseur"
+  field :watermark_text, :string?   # Scénario B : filigrane saisi par l'expéditeur
+  field :message, :text?            # Message personnalisé optionnel
+  field :status, :string            # "pending", "deposited", "viewed", "downloaded", "purged"
+  field :expires_at, :date_time     # Date d'expiration du lien
+  field :purge_at, :date_time       # Date de suppression automatique des documents
+  field :locale, :string            # Langue de la page de dépôt
+  field :created_at, :date_time, auto_now_add: true
+  field :updated_at, :date_time, auto_now: true
+  many_to_one :organization, Organization?    # Null en scénario B
+  many_to_one :created_by, User?              # Null en scénario B
+  many_to_many :document_types, DocumentType  # Scénario A uniquement
+end
+
+# Document déposé ou envoyé
+class Deposit < Marten::Model
+  field :original_filename, :string
+  field :content_type, :string      # "application/pdf", "image/jpeg"...
+  field :encrypted_path, :string    # Chemin du fichier chiffré sur disque
+  field :file_size, :int
+  field :watermark_text, :string    # Texte du filigrane appliqué
+  field :deposited_at, :date_time
+  field :viewed_at, :date_time?     # Première consultation par le destinataire
+  field :downloaded_at, :date_time? # Premier téléchargement PDF
+  field :purged_at, :date_time?     # Date de suppression effective
+  field :created_at, :date_time, auto_now_add: true
+  many_to_one :request, Request
+  many_to_one :document_type, DocumentType?   # Null en scénario B (documents libres)
+end
+
+# Journal d'audit
+class AuditLog < Marten::Model
+  field :action, :string            # "request_created", "deposit_received", "document_viewed"...
+  field :ip_address, :string?
+  field :user_agent, :string?
+  field :details, :json?
+  field :created_at, :date_time, auto_now_add: true
+  many_to_one :organization, Organization
+  many_to_one :user, User?          # Null si action du déposant (externe)
+  many_to_one :request, Request?
+end
+----
+
+=== États d'une demande
+
+[cols="1,3"]
+|===
+| Statut | Description
+
+| `pending` | Demande envoyée, en attente de dépôt
+| `deposited` | Documents déposés par le tiers
+| `viewed` | Documents consultés par le demandeur
+| `downloaded` | Documents téléchargés/imprimés en PDF
+| `purged` | Documents supprimés du serveur
+| `expired` | Lien expiré sans dépôt
+|===
+
+== Structure du projet
+
+[source]
+----
+scellio/
+├── shard.yml
+├── LICENSE                        # AGPL-3.0
+├── README.adoc
+├── SCELLIO-SPECS.adoc             # Ce document
+├── src/
+│   ├── project.cr                 # Point d'entrée Marten
+│   ├── models/
+│   │   ├── organization.cr
+│   │   ├── user.cr
+│   │   ├── document_type.cr
+│   │   ├── request.cr
+│   │   ├── deposit.cr
+│   │   ├── audit_log.cr
+│   │   └── subscription.cr
+│   ├── handlers/
+│   │   ├── home_handler.cr        # Page d'accueil / site web
+│   │   ├── auth_handler.cr        # Inscription, connexion, déconnexion
+│   │   ├── dashboard_handler.cr   # Tableau de bord demandeur (espace Organisation)
+│   │   ├── request_handler.cr     # Créer / gérer les demandes (scénario A)
+│   │   ├── deposit_handler.cr     # Page publique de dépôt (lien token, scénario A)
+│   │   ├── personal_handler.cr    # Espace Personnel (scénario B, sans compte)
+│   │   ├── download_handler.cr    # Page de téléchargement (scénario B, lien token)
+│   │   ├── document_handler.cr    # Consultation + téléchargement PDF filigrané
+│   │   ├── settings_handler.cr    # Configuration demandeur + types de documents
+│   │   ├── billing_handler.cr     # Choix du plan, paiement, gestion abonnement
+│   │   ├── stripe_webhook_handler.cr  # Webhooks Stripe (paiement, abonnement)
+│   │   ├── paypal_webhook_handler.cr  # Webhooks PayPal
+│   │   └── page_handler.cr        # Pages statiques du site web (AsciiDoc)
+│   ├── services/
+│   │   ├── watermarker.cr         # Filigranage PDF via crystal-pdf
+│   │   ├── encryptor.cr           # Chiffrement / déchiffrement des fichiers
+│   │   ├── notifier.cr            # Envoi email (demande, confirmation dépôt, rappel)
+│   │   └── purger.cr              # Suppression automatique des documents expirés
+│   ├── schemas/
+│   │   ├── request_schema.cr
+│   │   ├── deposit_schema.cr
+│   │   ├── personal_schema.cr     # Validation formulaire espace Personnel
+│   │   ├── organization_schema.cr
+│   │   └── billing_schema.cr
+│   ├── routes.cr
+│   ├── templates/
+│   │   ├── layouts/
+│   │   │   ├── app.html           # Layout espace Organisation (connecté)
+│   │   │   ├── personal.html      # Layout espace Personnel (sans compte)
+│   │   │   └── site.html          # Layout site web public
+│   │   ├── site/                  # Pages du site web public
+│   │   │   ├── home.html
+│   │   │   ├── how_it_works.html
+│   │   │   ├── pricing.html
+│   │   │   ├── security.html
+│   │   │   └── legal.html
+│   │   ├── auth/
+│   │   │   ├── login.html
+│   │   │   ├── register.html
+│   │   │   └── forgot_password.html
+│   │   ├── dashboard/
+│   │   │   └── index.html
+│   │   ├── requests/
+│   │   │   ├── list.html
+│   │   │   ├── new.html
+│   │   │   ├── show.html
+│   │   │   └── partials/
+│   │   │       ├── request_row.html
+│   │   │       └── request_form.html
+│   │   ├── personal/              # Espace Personnel (scénario B)
+│   │   │   ├── form.html          # Formulaire : document + filigrane + destinataire
+│   │   │   └── confirmation.html  # Confirmation d'envoi
+│   │   ├── download/              # Page téléchargement (scénario B, destinataire)
+│   │   │   ├── view.html          # Consultation + téléchargement du PDF filigrané
+│   │   │   └── expired.html       # Lien expiré
+│   │   ├── deposit/               # Pages publiques de dépôt (scénario A)
+│   │   │   ├── form.html
+│   │   │   ├── confirmation.html
+│   │   │   └── expired.html
+│   │   ├── documents/
+│   │   │   ├── view.html
+│   │   │   └── partials/
+│   │   │       └── document_card.html
+│   │   ├── billing/
+│   │   │   ├── plans.html
+│   │   │   ├── checkout.html
+│   │   │   └── subscription.html
+│   │   └── settings/
+│   │       ├── organization.html
+│   │       └── document_types.html
+│   └── emails/
+│       ├── request_to_depositor.html    # Scénario A : "SuperBocaux vous demande..."
+│       ├── deposit_confirmation.html    # Scénario A : "Vos documents ont été reçus"
+│       ├── deposit_notification.html    # Scénario A : "Un dépôt vient d'être effectué"
+│       ├── personal_to_recipient.html   # Scénario B : "X vous envoie un document sécurisé"
+│       ├── personal_confirmation.html   # Scénario B : "Votre document a été envoyé"
+│       ├── reminder.html                # Relance si pas de dépôt
+│       └── purge_notice.html            # "Vos documents ont été supprimés"
+├── config/
+│   ├── settings/
+│   │   ├── base.cr
+│   │   ├── development.cr
+│   │   ├── production.cr
+│   │   └── test.cr
+│   └── locales/
+│       ├── fr.yml
+│       ├── en.yml
+│       ├── de.yml
+│       ├── es.yml
+│       ├── it.yml
+│       ├── pt.yml
+│       ├── nl.yml
+│       ├── pl.yml
+│       ├── ro.yml
+│       ├── el.yml
+│       ├── cs.yml
+│       ├── hu.yml
+│       ├── sv.yml
+│       ├── da.yml
+│       ├── fi.yml
+│       ├── bg.yml
+│       ├── hr.yml
+│       ├── sk.yml
+│       ├── sl.yml
+│       ├── lt.yml
+│       ├── lv.yml
+│       ├── et.yml
+│       ├── ga.yml
+│       └── mt.yml
+├── content/                       # Pages du site web en AsciiDoc
+│   ├── how-it-works.adoc
+│   ├── security.adoc
+│   ├── pricing.adoc
+│   ├── legal/
+│   │   ├── terms.adoc
+│   │   ├── privacy.adoc
+│   │   └── gdpr.adoc
+│   └── faq.adoc
+├── spec/
+│   ├── spec_helper.cr
+│   ├── models/
+│   ├── handlers/
+│   ├── services/
+│   └── playwright/
+│       ├── deposit_flow.spec.ts     # Scénario A : demande → dépôt → consultation
+│       ├── personal_flow.spec.ts    # Scénario B : filigrane → envoi → téléchargement
+│       ├── request_flow.spec.ts     # Gestion des demandes (dashboard)
+│       ├── auth.spec.ts
+│       ├── i18n.spec.ts
+│       └── support/
+├── migrations/
+└── assets/
+    ├── images/
+    │   ├── scellio-logo-full.png
+    │   └── scellio-logo-compact.png
+    └── css/
+        └── scellio.css            # Variables Bulma personnalisées
+----
+
+== Sécurité
+
+=== Chiffrement des documents
+
+* Les fichiers déposés sont chiffrés côté serveur avec AES-256-GCM avant écriture sur disque
+* La clé de chiffrement est dérivée d'un secret propre à chaque `Request` (jamais stocké en base)
+* Le fichier original n'est jamais écrit en clair sur disque
+
+=== Suppression automatique (purge)
+
+* Chaque demande a une `purge_at` configurable (défaut : 7 jours après dépôt)
+* Un job Marten tourne périodiquement et supprime les fichiers + écrase les données
+* La suppression est irréversible et tracée dans l'audit log
+* Après purge, seules les métadonnées restent (qui a envoyé quoi, quand — sans le contenu)
+
+=== Filigranage
+
+Le filigrane est appliqué au moment de la *consultation* ou du *téléchargement*, pas au stockage. Le texte du filigrane inclut :
+
+* Nom du demandeur destinataire
+* Date de transmission
+* Motif de la demande
+* Mention : "Document transmis via Scellio —Usage exclusif : {motif}"
+
+=== Audit trail
+
+Chaque action est tracée :
+
+* Création de demande
+* Envoi d'email
+* Dépôt de document (IP, user-agent)
+* Consultation par le demandeur
+* Téléchargement PDF
+* Suppression automatique
+
+== Site web intégré
+
+Le site web public est intégré à l'application Marten. Les pages sont rédigées en AsciiDoc (dossier `content/`) et rendues par `crystal-asciidoctor`.
+
+=== Pages du site
+
+[cols="1,3"]
+|===
+| Page | Contenu
+
+| *Accueil* | Proposition de valeur, illustration du flux, CTA inscription
+| *Comment ça marche* | Explication en 3 étapes avec visuels
+| *Sécurité* | Chiffrement, suppression automatique, filigranage, RGPD, audit
+| *Tarifs* | Grille tarifaire, offre gratuite, plans payants
+| *FAQ* | Questions fréquentes
+| *Mentions légales* | CGU, politique de confidentialité, RGPD
+|===
+
+=== SEO et réseaux sociaux
+
+* Balises `<meta>` OpenGraph et Twitter Card sur chaque page
+* Sitemap XML généré automatiquement
+* Pages AsciiDoc rendues en HTML sémantique propre
+
+== Modèle économique
+
+=== Principe freemium
+
+L'application est gratuite pour les premières demandes, puis payante.
+
+=== Offre gratuite
+
+Les *N premières demandes* sont offertes pour permettre de tester le service sans engagement.
+
+Nombre recommandé : *17 demandes gratuites*.
+
+Justification :
+
+* 7 est trop peu — à peine le temps de valider l'outil avec un cas réel
+* 42 est trop généreux — certains petits demandeurs n'auraient jamais besoin de payer
+* 17 permet de tester sérieusement (2-3 semaines d'usage typique) tout en incitant à passer au payant
+
+=== Grille tarifaire (proposition)
+
+[cols="1,1,1,1"]
+|===
+| Plan | Demandes/mois | Rétention max | Prix/mois
+
+| *Gratuit* | 17 offertes (total, pas par mois) | 7 jours | 0 EUR
+| *Starter* | 50 | 14 jours | 9 EUR
+| *Pro* | 200 | 30 jours | 29 EUR
+| *Entreprise* | Illimité | 60 jours | 79 EUR
+|===
+
+NOTE: Les prix et seuils sont des propositions initiales à ajuster selon les retours du marché.
+
+=== Paiement
+
+Trois moyens de paiement proposés :
+
+[cols="1,2,2"]
+|===
+| Moyen | Usage | Détails techniques
+
+| *Carte bancaire (Stripe)* | Paiement principal, abonnement mensuel récurrent | Stripe Checkout + Stripe Billing pour les abonnements, webhooks pour activer/désactiver les plans
+| *PayPal* | Alternative pour les demandeurs qui préfèrent PayPal | PayPal Subscriptions API, synchronisé avec le même système de plans
+| *Prélèvement SEPA* | Entreprises européennes, paiement par prélèvement bancaire | `crystal-sepa` (aloli-crystal) — génération directe du fichier pain.008, soumission à la banque, zéro commission
+|===
+
+==== Flux de paiement
+
+. Le demandeur épuise ses 17 demandes gratuites
+. L'application propose le choix du plan et du moyen de paiement
+. Redirection vers Stripe Checkout (carte ou SEPA) ou PayPal
+. Webhook confirme le paiement → plan activé immédiatement
+. Renouvellement automatique chaque mois (annulation possible à tout moment)
+
+==== Modèles de données
+
+[source,crystal]
+----
+class Subscription < Marten::Model
+  field :plan, :string                # "starter", "pro", "enterprise"
+  field :payment_method, :string      # "stripe_card", "stripe_sepa", "paypal"
+  field :external_id, :string         # ID Stripe ou PayPal de l'abonnement
+  field :status, :string              # "active", "past_due", "cancelled", "expired"
+  field :current_period_start, :date_time
+  field :current_period_end, :date_time
+  field :created_at, :date_time, auto_now_add: true
+  field :updated_at, :date_time, auto_now: true
+  many_to_one :organization, Organization
+end
+----
+
+==== Sécurité des paiements
+
+* Aucune donnée bancaire ne transite ni n'est stockée par Scellio
+* Stripe et PayPal gèrent intégralement la collecte et le stockage des données de paiement (PCI-DSS)
+* Les webhooks sont vérifiés par signature (Stripe webhook signing secret, PayPal webhook ID)
+
+=== Fonctionnalités par plan
+
+[cols="1,1,1,1,1"]
+|===
+| Fonctionnalité | Gratuit | Starter | Pro | Entreprise
+
+| Demandes de documents | 17 total | 50/mois | 200/mois | Illimité
+| Types de documents personnalisés | 3 | 10 | Illimité | Illimité
+| Utilisateurs par demandeur | 1 | 3 | 10 | Illimité
+| Rétention des documents | 7 jours | 14 jours | 30 jours | 60 jours
+| Personnalisation du filigrane | Non | Oui | Oui | Oui
+| Logo sur la page de dépôt | Non | Non | Oui | Oui
+| API | Non | Non | Non | Oui
+| Support | Communauté | Email | Email prioritaire | Dédié
+|===
+
+== Communication et marketing
+
+=== Mini-cards MOO
+
+Format : 70 x 28 mm (mini-card MOO standard)
+
+==== Recto
+
+* Logo Scellio compact
+* Tagline : "Vos documents scellés, transmis, puis effacés"
+* URL : scellio.fr
+
+==== Verso (plusieurs versions)
+
+*Version A —Le problème*
+
+____
+Vous envoyez encore vos Kbis par email ? +
+-> scellio.fr
+____
+
+*Version B —La solution*
+
+____
+Documents filigranés. +
+Transmission sécurisée. +
+Suppression automatique. +
+-> scellio.fr
+____
+
+*Version C —L'appel*
+
+____
+17 transmissions offertes. +
+Zéro engagement. +
+-> scellio.fr
+____
+
+=== Autres supports marketing
+
+[cols="1,3"]
+|===
+| Support | Description
+
+| *Stickers* | Logo Scellio + QR code vers scellio.fr — format 5x5 cm, à coller sur les laptops
+| *Kakémono / roll-up* | Pour les salons et événements — flux en 3 étapes illustré
+| *Signature email* | Bandeau "Documents transmis via Scellio — scellio.fr" à intégrer dans les emails
+| *LinkedIn posts* | Série de 5 posts courts : le problème / la solution / la sécurité / le gratuit / le lancement
+| *Vidéo démo* | Screencast 90 secondes : créer une demande → dépôt → consultation → suppression
+| *Flyer A5* | Recto : proposition de valeur. Verso : QR code + "17 transmissions offertes"
+| *Badge "Secured by Scellio"* | Petit badge SVG que les demandeurs peuvent afficher sur leur site
+|===
+
+=== Positionnement
+
+[cols="1,1"]
+|===
+| Concurrent | Différenciateur Scellio
+
+| Email classique | Filigranage + suppression automatique + traçabilité
+| WeTransfer / Smash | Pas de filigranage, pas de workflow demande/dépôt, pas de suppression garantie
+| Filigrane.beta.gouv.fr | Pas de workflow, l'utilisateur filigrane lui-même, pas de compte demandeur
+| Solutions de signature (DocuSign, Yousign) | Trop complexe et cher pour une simple transmission de documents
+|===
+
+== Tests
+
+=== Tests unitaires — Crystal Spec
+
+* Modèles : validation, états, associations
+* Services : watermarker, encryptor, purger, notifier
+* Handlers : routes, permissions, réponses
+
+=== Tests Playwright
+
+[cols="1,3"]
+|===
+| Flux | Ce qui est testé
+
+| *Inscription* | Création de compte, configuration demandeur, ajout types de documents
+| *Demande (A)* | Création demande, envoi email, lien sécurisé fonctionnel
+| *Dépôt (A)* | Page publique, upload documents, confirmation, notification demandeur
+| *Personnel (B)* | Formulaire espace personnel, saisie filigrane, envoi, confirmation
+| *Téléchargement (B)* | Réception email, page de téléchargement, PDF filigrané
+| *Consultation* | Affichage documents filigranés, téléchargement PDF
+| *Purge* | Documents supprimés après délai, page "documents supprimés"
+| *i18n* | Navigation en FR, EN, DE — toutes les pages traduites, les deux espaces
+| *Permissions* | Admin vs member, accès interdit sans login, espace personnel sans compte
+| *Expiration* | Lien expiré → page d'erreur appropriée (scénarios A et B)
+| *Paiement* | Choix du plan, redirection Stripe/PayPal, webhook → plan activé, annulation
+|===
+
+=== TDD obligatoire
+
+WARNING: Les specs sont écrites *avant* le code. Toujours.
+
+== Dépendances Crystal
+
+[cols="1,3"]
+|===
+| Shard | Usage
+
+| `marten` | Framework web
+| `marten-auth` | Authentification
+| `crystal-pdf` (aloli-crystal) | Filigranage PDF
+| `crystal-asciidoctor` (aloli-crystal) | Rendu des pages du site web
+| `crystal-asciidoctor-pdf` (aloli-crystal) | Export PDF des pages (si besoin)
+| `carbon` | Envoi d'emails
+| `crystal-deploy` (aloli-crystal) | Déploiement automatisé
+| `stripe` | Paiement carte bancaire (API Stripe)
+| `paypal` | Paiement PayPal (API PayPal Subscriptions)
+| `crystal-sepa` (aloli-crystal) | Prélèvement SEPA — génération pain.008 (zéro commission)
+|===
+
+Aucune dépendance Java, Node.js, Ruby ou Python.
+
+== RGPD et conformité
+
+=== Données personnelles traitées
+
+* Email et nom du déposant (fournis par le demandeur)
+* Documents déposés (chiffrés, supprimés automatiquement)
+* Adresse IP et user-agent lors du dépôt (audit trail)
+
+=== Droits des personnes
+
+* *Droit d'accès* : le déposant peut demander quelles données le concernent
+* *Droit à l'effacement* : les documents sont supprimés automatiquement (purge)
+* *Droit d'opposition* : le déposant peut refuser de déposer (le lien n'est pas une obligation)
+
+=== Base légale
+
+* Intérêt légitime du demandeur (besoin documentaire pour la relation commerciale)
+* Consentement du déposant (action volontaire de dépôt)
+
+=== Sous-traitance
+
+Scellio est sous-traitant au sens du RGPD. Un DPA (Data Processing Agreement) est proposé aux demandeurs sur le plan Pro et Entreprise.
+
+== Historique des décisions
+
+[cols="1,2,3"]
+|===
+| Date | Décision | Raison
+
+| 15 avril 2026 | Crystal + Marten | Cohérence avec l'écosystème aloli-crystal, pas de dépendance externe
+| 15 avril 2026 | Filigranage serveur (option A) | Le demandeur doit pouvoir consulter les documents, traitement côté client incompatible avec le workflow
+| 15 avril 2026 | AGPL-3.0 | Open source avec protection contre les forks privés. Modèle SaaS.
+| 15 avril 2026 | i18n dès le départ | Positionnement européen, 24 langues UE
+| 15 avril 2026 | Bulma + HTMX + Opal | Cohérence stack, pas de JS, pas de build step
+| 15 avril 2026 | 17 demandes gratuites | Équilibre entre test sérieux et incitation à passer au payant
+| 15 avril 2026 | Domaines scellio.fr + scellio.eu | Disponibles, positionnement FR + EU
+| 15 avril 2026 | Site web intégré à l'app | Pas de site séparé, pages AsciiDoc rendues par crystal-asciidoctor
+| 15 avril 2026 | Suppression automatique des documents | Sécurité par design, RGPD, confiance utilisateur
+| 15 avril 2026 | Chiffrement AES-256-GCM | Standard de chiffrement reconnu, disponible dans stdlib Crystal
+| 15 avril 2026 | Paiement Stripe + PayPal + SEPA | Trois moyens de paiement pour couvrir tous les profils de demandeurs européens
+| 15 avril 2026 | Deux espaces : Organisation + Personnel | Scénario A (le demandeur initie) + scénario B (le particulier initie) — deux usages complémentaires
+|===

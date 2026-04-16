@@ -1,0 +1,144 @@
+{% extend "base.html" %}
+
+{% block title %}Scellio — Vos documents scellés, transmis, puis effacés{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero is-primary is-medium">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <p class="title is-1 has-text-white">
+        Scellio
+      </p>
+      <p class="subtitle is-3 has-text-white mt-3">
+        Vos documents scellés, transmis, puis effacés.
+      </p>
+      <p class="is-size-5 has-text-white mt-4 mb-5" style="max-width: 700px; margin-left: auto; margin-right: auto;">
+        Transmettez vos documents administratifs en toute sécurité.
+        Filigranage automatique, stockage chiffré, suppression garantie.
+      </p>
+      <div class="buttons is-centered mt-5">
+        <a class="button is-light is-medium" href="/auth/sign-in">
+          <strong>Espace Organisation</strong>
+        </a>
+        <a class="button is-danger is-medium" href="/personnel">
+          <strong>Espace Personnel</strong>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Comment ça marche -->
+<section class="section">
+  <div class="container">
+    <h2 class="title is-2 has-text-centered mb-6">Comment ça marche</h2>
+    <div class="columns is-variable is-8">
+      <div class="column has-text-centered">
+        <p class="title is-1 mb-4">1</p>
+        <h3 class="title is-4">Demandez</h3>
+        <p class="is-size-5">
+          Configurez les documents nécessaires et envoyez un lien sécurisé à votre interlocuteur.
+        </p>
+      </div>
+      <div class="column has-text-centered">
+        <p class="title is-1 mb-4">2</p>
+        <h3 class="title is-4">Déposez</h3>
+        <p class="is-size-5">
+          Votre interlocuteur dépose ses documents via le lien. Ils sont chiffrés immédiatement.
+        </p>
+      </div>
+      <div class="column has-text-centered">
+        <p class="title is-1 mb-4">3</p>
+        <h3 class="title is-4">Consultez</h3>
+        <p class="is-size-5">
+          Les documents filigranés sont prêts. Téléchargez-les, ils seront ensuite supprimés.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Deux espaces -->
+<section class="section" style="background-color: var(--scellio-gray);">
+  <div class="container">
+    <div class="columns is-variable is-8">
+      <div class="column">
+        <div class="card" style="height: 100%;">
+          <div class="card-content">
+            <p class="title is-4">Espace Organisation</p>
+            <div class="content is-size-5">
+              <p>
+                Vous êtes un professionnel qui a besoin de recevoir des documents administratifs
+                de vos clients, locataires ou partenaires.
+              </p>
+              <p class="has-text-weight-semibold">
+                17 demandes offertes, sans engagement.
+              </p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a class="card-footer-item button is-primary is-fullwidth" href="/auth/sign-up">
+              Créer un compte
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="card" style="height: 100%;">
+          <div class="card-content">
+            <p class="title is-4">Espace Personnel</p>
+            <div class="content is-size-5">
+              <p>
+                Vous devez envoyer vos documents à un organisme ?
+                Filigranez-les vous-même avant de les transmettre.
+              </p>
+              <p class="has-text-weight-semibold">
+                Gratuit, sans inscription.
+              </p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a class="card-footer-item button is-danger is-fullwidth" href="/personnel">
+              Filigraner mes documents
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sécurité -->
+<section class="section">
+  <div class="container">
+    <h2 class="title is-2 has-text-centered mb-6">Sécurité par conception</h2>
+    <div class="columns is-multiline is-variable is-6">
+      <div class="column is-half">
+        <div class="box">
+          <h3 class="title is-5">Chiffrement AES-256</h3>
+          <p>Chaque document est chiffré côté serveur avec une clé unique. Vos données restent illisibles, même en cas d'intrusion.</p>
+        </div>
+      </div>
+      <div class="column is-half">
+        <div class="box">
+          <h3 class="title is-5">Filigranage automatique</h3>
+          <p>Un filigrane personnalisé est apposé sur chaque document, rendant toute réutilisation frauduleuse traçable.</p>
+        </div>
+      </div>
+      <div class="column is-half">
+        <div class="box">
+          <h3 class="title is-5">Suppression programmée</h3>
+          <p>Les documents sont automatiquement supprimés après consultation ou à l'expiration du délai défini.</p>
+        </div>
+      </div>
+      <div class="column is-half">
+        <div class="box">
+          <h3 class="title is-5">Audit trail complet</h3>
+          <p>Chaque action est journalisée : dépôt, consultation, téléchargement, suppression. Traçabilité totale.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

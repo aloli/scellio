@@ -1,0 +1,10 @@
+name: scellio-essai
+version: 0.1.0
+
+dependencies:
+  crystal-pdf:
+    path: /Users/philippe/prod-crystal/crystal-pdf
+  crystal-watermark:
+    path: /Users/philippe/prod-crystal/crystal-watermark
+
+crystal: ">= 1.19.0"

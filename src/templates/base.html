@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="{% block lang %}fr{% endblock %}">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}Scellio — Vos documents scellés, transmis, puis effacés.{% endblock %}">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+    <!-- Charte Scellio -->
+    <style>
+      :root {
+        --scellio-navy: #1B2A4A;
+        --scellio-brick: #8B3A3A;
+        --scellio-brick-light: #C25A5A;
+        --scellio-white: #FFFFFF;
+        --scellio-gray: #F5F5F5;
+      }
+      .navbar, .hero.is-primary { background-color: var(--scellio-navy) !important; }
+      .button.is-primary { background-color: var(--scellio-navy) !important; }
+      .button.is-primary:hover { background-color: #2A3D6A !important; }
+      .button.is-danger { background-color: var(--scellio-brick) !important; }
+      .footer { background-color: var(--scellio-gray); }
+      a.has-text-primary { color: var(--scellio-navy) !important; }
+    </style>
+
+    <title>{% block title %}Scellio{% endblock %}</title>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+      <div class="container">
+        <div class="navbar-brand">
+          <a class="navbar-item has-text-weight-bold is-size-4" href="/">
+            Scellio
+          </a>
+          <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </a>
+        </div>
+        <div id="navMenu" class="navbar-menu">
+          <div class="navbar-start">
+            {% block navbar_start %}
+            {% endblock %}
+          </div>
+          <div class="navbar-end">
+            {% block navbar_end %}
+            <div class="navbar-item">
+              <div class="buttons">
+                <a class="button is-light" href="/personnel">
+                  <strong>Espace personnel</strong>
+                </a>
+              </div>
+            </div>
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Messages flash -->
+    {% if not flash.empty? %}
+    <section class="section py-3">
+      <div class="container">
+        {% for key, message in flash %}
+        <div class="notification {% if key == 'success' %}is-success{% elsif key == 'error' %}is-danger{% elsif key == 'warning' %}is-warning{% else %}is-info{% endif %} is-light">
+          <button class="delete"></button>
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Contenu principal -->
+    {% block content %}
+    {% endblock content %}
+
+    <!-- Pied de page -->
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong>Scellio</strong> — Vos documents scellés, transmis, puis effacés.
+        </p>
+        <p class="is-size-7 has-text-grey">
+          <a href="/securite">Sécurité</a> ·
+          <a href="/tarifs">Tarifs</a> ·
+          <a href="/mentions-legales">Mentions légales</a> ·
+          <a href="/confidentialite">Confidentialité</a>
+        </p>
+      </div>
+    </footer>
+
+    <!-- Fermer les notifications -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.notification .delete').forEach(btn => {
+          btn.addEventListener('click', () => btn.parentNode.remove());
+        });
+        document.querySelectorAll('.navbar-burger').forEach(btn => {
+          btn.addEventListener('click', () => {
+            btn.classList.toggle('is-active');
+            document.getElementById(btn.dataset.target).classList.toggle('is-active');
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
