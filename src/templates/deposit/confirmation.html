@@ -1,0 +1,42 @@
+{% extend "base.html" %}
+
+{% block title %}Documents deposes — Scellio{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8 has-text-centered">
+        <div class="box">
+          <span class="icon is-large has-text-success">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </span>
+
+          <h1 class="title is-3 mt-4">Vos documents ont ete deposes avec succes !</h1>
+
+          <div class="content mt-5">
+            <p class="is-size-5">
+              {% if organization %}
+              <strong>{{ organization.name }}</strong> a bien recu votre depot.
+              {% else %}
+              Votre depot a bien ete enregistre.
+              {% endif %}
+            </p>
+            <p class="has-text-grey">
+              Objet : {{ request.purpose }}
+            </p>
+          </div>
+
+          <div class="notification is-info is-light mt-5">
+            <p>Le demandeur sera notifie et pourra consulter vos documents filigranes.</p>
+            <p class="has-text-grey-dark mt-2">Les documents seront automatiquement supprimes apres consultation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

@@ -1,0 +1,110 @@
+{% extend "base.html" %}
+
+{% block title %}Tableau de bord — Scellio{% endblock %}
+
+{% block navbar_start %}
+<a class="navbar-item" href="/tableau-de-bord">Tableau de bord</a>
+<a class="navbar-item" href="/demandes">Demandes</a>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero is-primary">
+  <div class="hero-body">
+    <div class="container">
+      <p class="title has-text-white">Tableau de bord</p>
+      <p class="subtitle has-text-white">
+        {% if organization %}{{ organization.name }}{% endif %}
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Statistiques -->
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      <div class="column">
+        <div class="box has-text-centered">
+          <p class="heading">Total des demandes</p>
+          <p class="title">{{ total_requests }}</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="box has-text-centered">
+          <p class="heading">En attente</p>
+          <p class="title has-text-warning">{{ pending_requests }}</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="box has-text-centered">
+          <p class="heading">Documents reçus</p>
+          <p class="title has-text-info">{{ deposited_requests }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demandes récentes -->
+    <div class="box mt-5">
+      <div class="level">
+        <div class="level-left">
+          <h2 class="title is-4">Demandes récentes</h2>
+        </div>
+        <div class="level-right">
+          <a class="button is-primary" href="/demandes/nouvelle">Nouvelle demande</a>
+        </div>
+      </div>
+
+      {% if requests %}
+      <div class="table-container">
+        <table class="table is-fullwidth is-hoverable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Destinataire</th>
+              <th>Motif</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for req in requests %}
+            <tr>
+              <td>{{ req.created_at }}</td>
+              <td>
+                {{ req.recipient_email }}
+                {% if req.recipient_name %}
+                <br><small class="has-text-grey">{{ req.recipient_name }}</small>
+                {% endif %}
+              </td>
+              <td>{{ req.purpose }}</td>
+              <td>
+                {% if req.status == "pending" %}
+                  <span class="tag is-warning">En attente</span>
+                {% elsif req.status == "deposited" %}
+                  <span class="tag is-info">Déposé</span>
+                {% elsif req.status == "viewed" %}
+                  <span class="tag is-success">Consulté</span>
+                {% elsif req.status == "downloaded" %}
+                  <span class="tag is-primary">Téléchargé</span>
+                {% elsif req.status == "purged" %}
+                  <span class="tag is-light">Purgé</span>
+                {% else %}
+                  <span class="tag">{{ req.status }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <a class="button is-small is-outlined" href="/demandes/{{ req.id }}">Voir</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="has-text-grey has-text-centered py-5">Aucune demande pour le moment.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock content %}

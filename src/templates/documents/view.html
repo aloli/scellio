@@ -1,0 +1,129 @@
+{% extend "base.html" %}
+
+{% block title %}Document — {{ deposit.original_filename }} — Scellio{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="{% url 'request_list' %}">Demandes</a></li>
+        <li><a href="{% url 'request_detail' request_id: request.id %}">Demande #{{ request.id }}</a></li>
+        <li class="is-active"><a href="#" aria-current="page">{{ deposit.original_filename }}</a></li>
+      </ul>
+    </nav>
+
+    <h1 class="title is-3">
+      <span class="icon"><i class="fas fa-file"></i></span>
+      {{ deposit.original_filename }}
+    </h1>
+
+    <div class="columns">
+      <!-- Informations du document -->
+      <div class="column is-4">
+        <div class="card">
+          <div class="card-content">
+            <h2 class="title is-5">Informations</h2>
+
+            <div class="field">
+              <label class="label is-small has-text-grey">Nom du fichier</label>
+              <p>{{ deposit.original_filename }}</p>
+            </div>
+
+            <div class="field">
+              <label class="label is-small has-text-grey">Type</label>
+              <p>{{ deposit.content_type }}</p>
+            </div>
+
+            <div class="field">
+              <label class="label is-small has-text-grey">Taille</label>
+              <p>{{ deposit.file_size }} octets</p>
+            </div>
+
+            <div class="field">
+              <label class="label is-small has-text-grey">Date de dépôt</label>
+              <p>{{ deposit.deposited_at }}</p>
+            </div>
+
+            {% if deposit.viewed_at %}
+            <div class="field">
+              <label class="label is-small has-text-grey">Consulté le</label>
+              <p>{{ deposit.viewed_at }}</p>
+            </div>
+            {% endif %}
+
+            {% if deposit.downloaded_at %}
+            <div class="field">
+              <label class="label is-small has-text-grey">Téléchargé le</label>
+              <p>{{ deposit.downloaded_at }}</p>
+            </div>
+            {% endif %}
+
+            <hr>
+
+            <div class="field">
+              <label class="label is-small has-text-grey">Filigrane appliqué</label>
+              <p class="is-size-7 has-text-grey-dark">{{ deposit.watermark_text }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <a href="{% url 'document_download' request_id: request.id deposit_id: deposit.id %}"
+             class="button is-primary is-fullwidth">
+            <span class="icon"><i class="fas fa-download"></i></span>
+            <span>Télécharger le document filigrané</span>
+          </a>
+        </div>
+
+        <div class="mt-3">
+          <a href="{% url 'request_detail' request_id: request.id %}"
+             class="button is-light is-fullwidth">
+            <span class="icon"><i class="fas fa-arrow-left"></i></span>
+            <span>Retour à la demande</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Zone de prévisualisation -->
+      <div class="column is-8">
+        <div class="card">
+          <div class="card-content">
+            <h2 class="title is-5">Prévisualisation</h2>
+
+            {% if deposit.content_type == "application/pdf" %}
+              <div class="has-text-centered">
+                <p class="mb-4 has-text-grey">
+                  La prévisualisation PDF n'est disponible qu'après téléchargement du document filigrané.
+                </p>
+                <a href="{% url 'document_download' request_id: request.id deposit_id: deposit.id %}"
+                   class="button is-primary">
+                  <span class="icon"><i class="fas fa-download"></i></span>
+                  <span>Télécharger pour consulter</span>
+                </a>
+              </div>
+            {% elsif deposit.content_type == "image/png" %}
+              <div class="has-text-centered">
+                <p class="mb-4 has-text-grey">
+                  L'aperçu sera disponible après application du filigrane.
+                </p>
+              </div>
+            {% elsif deposit.content_type == "image/jpeg" %}
+              <div class="has-text-centered">
+                <p class="mb-4 has-text-grey">
+                  L'aperçu sera disponible après application du filigrane.
+                </p>
+              </div>
+            {% else %}
+              <div class="notification is-warning is-light">
+                <p>La prévisualisation n'est pas disponible pour ce type de fichier ({{ deposit.content_type }}).</p>
+                <p class="mt-2">Veuillez télécharger le document pour le consulter.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

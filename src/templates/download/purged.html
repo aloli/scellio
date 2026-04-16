@@ -1,0 +1,28 @@
+{% extend "base.html" %}
+
+{% block title %}Documents supprimes — Scellio{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8 has-text-centered">
+        <div class="box">
+          <span class="icon is-large has-text-info">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </span>
+
+          <h1 class="title is-3 mt-4">Les documents ont deja ete supprimes.</h1>
+
+          <p class="is-size-5 has-text-grey mt-4">
+            Les documents sont automatiquement effaces apres telechargement par le destinataire.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

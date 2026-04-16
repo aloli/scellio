@@ -1,0 +1,28 @@
+{% extend "base.html" %}
+
+{% block title %}Lien expire — Scellio{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8 has-text-centered">
+        <div class="box">
+          <span class="icon is-large has-text-warning">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </span>
+
+          <h1 class="title is-3 mt-4">Ce lien de depot a expire.</h1>
+
+          <p class="is-size-5 has-text-grey mt-4">
+            Contactez le demandeur pour obtenir un nouveau lien.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

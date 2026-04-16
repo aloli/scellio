@@ -1,0 +1,128 @@
+{% extend "base.html" %}
+
+{% block title %}Paramètres — Scellio{% endblock %}
+
+{% block navbar_start %}
+<a class="navbar-item" href="/tableau-de-bord">Tableau de bord</a>
+<a class="navbar-item" href="/demandes">Demandes</a>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title is-3">Paramètres</h1>
+
+    <div class="columns">
+      <!-- Informations de l'organisation -->
+      <div class="column is-6">
+        <div class="box">
+          <h2 class="title is-5">Organisation</h2>
+          {% if organization %}
+          <div class="content">
+            <table class="table is-fullwidth">
+              <tr>
+                <th>Nom</th>
+                <td>{{ organization.name }}</td>
+              </tr>
+              <tr>
+                <th>E-mail</th>
+                <td>{{ organization.email }}</td>
+              </tr>
+              <tr>
+                <th>Forfait</th>
+                <td>
+                  {% if organization.plan == "free" %}
+                    <span class="tag is-light">Gratuit</span>
+                  {% elsif organization.plan == "pro" %}
+                    <span class="tag is-primary">Pro</span>
+                  {% elsif organization.plan == "enterprise" %}
+                    <span class="tag is-warning">Entreprise</span>
+                  {% else %}
+                    <span class="tag">{{ organization.plan }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              <tr>
+                <th>Demandes effectuées</th>
+                <td>{{ organization.requests_count }}</td>
+              </tr>
+            </table>
+          </div>
+          {% else %}
+          <p class="has-text-grey">Aucune organisation associée.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Types de documents -->
+      <div class="column is-6">
+        <div class="box">
+          <h2 class="title is-5">Types de documents</h2>
+          <p class="mb-4 has-text-grey">Définissez les types de documents que vous demandez habituellement.</p>
+
+          {% if document_types %}
+          <div class="mb-4">
+            {% for doc_type in document_types %}
+            <div class="box p-3 mb-2">
+              <div class="level is-mobile">
+                <div class="level-left">
+                  <div>
+                    <p class="has-text-weight-semibold">{{ doc_type.name }}</p>
+                    {% if doc_type.description %}
+                    <p class="is-size-7 has-text-grey">{{ doc_type.description }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="level-right">
+                  {% if doc_type.is_mandatory %}
+                  <span class="tag is-warning is-small">Obligatoire</span>
+                  {% else %}
+                  <span class="tag is-light is-small">Optionnel</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <!-- Formulaire d'ajout -->
+          <form method="post" action="/parametres"
+                hx-post="/parametres" hx-target="body" hx-swap="outerHTML">
+            <input type="hidden" name="csrftoken" value="{{ csrf_token }}">
+
+            <div class="field">
+              <label class="label" for="name">Nom du type de document</label>
+              <div class="control">
+                <input class="input" type="text" name="name" id="name"
+                       placeholder="Pièce d'identité, Justificatif de domicile..." required>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="description">Description</label>
+              <div class="control">
+                <input class="input" type="text" name="description" id="description"
+                       placeholder="Carte d'identité, passeport ou permis de conduire">
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="checkbox">
+                <input type="checkbox" name="is_mandatory" checked>
+                Obligatoire
+              </label>
+            </div>
+
+            <div class="field">
+              <div class="control">
+                <button class="button is-primary" type="submit">Ajouter</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

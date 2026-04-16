@@ -1,0 +1,137 @@
+{% extend "base.html" %}
+
+{% block title %}Demande #{{ req.id }} — Scellio{% endblock %}
+
+{% block navbar_start %}
+<a class="navbar-item" href="/tableau-de-bord">Tableau de bord</a>
+<a class="navbar-item is-active" href="/demandes">Demandes</a>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a href="/tableau-de-bord">Tableau de bord</a></li>
+        <li><a href="/demandes">Demandes</a></li>
+        <li class="is-active"><a href="#" aria-current="page">Demande #{{ req.id }}</a></li>
+      </ul>
+    </nav>
+
+    <div class="columns">
+      <!-- Détails de la demande -->
+      <div class="column is-8">
+        <div class="box">
+          <h1 class="title is-4">Demande #{{ req.id }}</h1>
+
+          <div class="columns is-multiline">
+            <div class="column is-half">
+              <p class="heading">Destinataire</p>
+              <p>
+                {{ req.recipient_email }}
+                {% if req.recipient_name %}
+                <br><small class="has-text-grey">{{ req.recipient_name }}</small>
+                {% endif %}
+              </p>
+            </div>
+            <div class="column is-half">
+              <p class="heading">Statut</p>
+              <p>
+                {% if req.status == "pending" %}
+                  <span class="tag is-warning is-medium">En attente</span>
+                {% elsif req.status == "deposited" %}
+                  <span class="tag is-info is-medium">Déposé</span>
+                {% elsif req.status == "viewed" %}
+                  <span class="tag is-success is-medium">Consulté</span>
+                {% elsif req.status == "downloaded" %}
+                  <span class="tag is-primary is-medium">Téléchargé</span>
+                {% elsif req.status == "purged" %}
+                  <span class="tag is-light is-medium">Purgé</span>
+                {% else %}
+                  <span class="tag is-medium">{{ req.status }}</span>
+                {% endif %}
+              </p>
+            </div>
+            <div class="column is-half">
+              <p class="heading">Motif</p>
+              <p>{{ req.purpose }}</p>
+            </div>
+            <div class="column is-half">
+              <p class="heading">Créée le</p>
+              <p>{{ req.created_at }}</p>
+            </div>
+            <div class="column is-half">
+              <p class="heading">Expire le</p>
+              <p>{{ req.expires_at }}</p>
+            </div>
+            <div class="column is-half">
+              <p class="heading">Purge le</p>
+              <p>{{ req.purge_at }}</p>
+            </div>
+          </div>
+
+          {% if req.message %}
+          <div class="mt-4">
+            <p class="heading">Message</p>
+            <div class="content">
+              <p>{{ req.message }}</p>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Lien de dépôt -->
+        <div class="box">
+          <h2 class="title is-5">Lien de dépôt</h2>
+          <p class="mb-3">Partagez ce lien avec le destinataire pour qu'il puisse déposer ses documents :</p>
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input class="input" type="text" id="deposit-url"
+                     value="/depot/{{ req.token }}" readonly>
+            </div>
+            <div class="control">
+              <button class="button is-primary" onclick="navigator.clipboard.writeText(document.getElementById('deposit-url').value)">
+                Copier
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dépôts reçus -->
+      <div class="column is-4">
+        <div class="box">
+          <h2 class="title is-5">Documents reçus</h2>
+
+          {% if deposits %}
+          {% for deposit in deposits %}
+          <div class="card mb-3">
+            <div class="card-content p-3">
+              <p class="has-text-weight-semibold">{{ deposit.original_filename }}</p>
+              <p class="is-size-7 has-text-grey">
+                {{ deposit.file_size }} octets
+                <br>Déposé le {{ deposit.deposited_at }}
+              </p>
+              <div class="mt-2">
+                {% if deposit.purged_at %}
+                  <span class="tag is-light is-small">Purgé</span>
+                {% elsif deposit.downloaded_at %}
+                  <span class="tag is-primary is-small">Téléchargé</span>
+                {% elsif deposit.viewed_at %}
+                  <span class="tag is-success is-small">Consulté</span>
+                {% else %}
+                  <span class="tag is-info is-small">Reçu</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          {% else %}
+          <p class="has-text-grey has-text-centered py-4">Aucun document reçu.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

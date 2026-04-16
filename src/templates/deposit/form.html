@@ -1,0 +1,104 @@
+{% extend "base.html" %}
+
+{% block title %}Dépot de documents — Scellio{% endblock %}
+
+{% block content %}
+<section class="hero is-primary is-medium">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title is-2">
+        {% if organization %}{{ organization.name }}{% else %}Un demandeur{% endif %}
+        vous demande des documents
+      </h1>
+      <h2 class="subtitle is-4">
+        {{ request.purpose }}
+      </h2>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        {% if request.message %}
+        <div class="notification is-info is-light">
+          <p class="has-text-weight-semibold mb-2">Message du demandeur :</p>
+          <p>{{ request.message }}</p>
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+          <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+          <div class="box">
+            <h3 class="title is-5 mb-4">Vos documents</h3>
+
+            <div class="file is-boxed is-centered is-fullwidth is-primary" id="file-upload-area">
+              <label class="file-label" style="width: 100%;">
+                <input class="file-input" type="file" name="files" multiple accept=".pdf,.jpg,.jpeg,.png">
+                <span class="file-cta" style="width: 100%; padding: 3rem;">
+                  <span class="file-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                  </span>
+                  <span class="file-label has-text-centered">
+                    Glissez vos fichiers ici ou cliquez pour parcourir
+                  </span>
+                </span>
+              </label>
+            </div>
+
+            <p class="help has-text-centered mt-3">Formats acceptes : PDF, JPG, PNG</p>
+
+            <div id="file-list" class="mt-4"></div>
+          </div>
+
+          <div class="has-text-centered mt-5">
+            <button type="submit" class="button is-primary is-large">
+              Deposer mes documents
+            </button>
+          </div>
+        </form>
+
+        <div class="notification is-light mt-5">
+          <p class="has-text-centered has-text-grey">
+            <span class="icon is-small">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            Vos documents seront chiffres, filigranes et supprimes automatiquement apres consultation.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const fileInput = document.querySelector('.file-input');
+  const fileList = document.getElementById('file-list');
+
+  fileInput.addEventListener('change', () => {
+    fileList.innerHTML = '';
+    if (fileInput.files.length > 0) {
+      const list = document.createElement('div');
+      list.className = 'tags are-medium';
+      for (const file of fileInput.files) {
+        const tag = document.createElement('span');
+        tag.className = 'tag is-info is-light';
+        tag.textContent = file.name;
+        list.appendChild(tag);
+      }
+      fileList.appendChild(list);
+    }
+  });
+});
+</script>
+{% endblock content %}

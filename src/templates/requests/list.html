@@ -1,0 +1,78 @@
+{% extend "base.html" %}
+
+{% block title %}Demandes — Scellio{% endblock %}
+
+{% block navbar_start %}
+<a class="navbar-item" href="/tableau-de-bord">Tableau de bord</a>
+<a class="navbar-item is-active" href="/demandes">Demandes</a>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="level">
+      <div class="level-left">
+        <h1 class="title is-3">Demandes</h1>
+      </div>
+      <div class="level-right">
+        <a class="button is-primary" href="/demandes/nouvelle">Nouvelle demande</a>
+      </div>
+    </div>
+
+    {% if requests %}
+    <div class="table-container">
+      <table class="table is-fullwidth is-hoverable is-striped">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Destinataire</th>
+            <th>Motif</th>
+            <th>Statut</th>
+            <th>Expiration</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in requests %}
+          <tr>
+            <td>{{ req.created_at }}</td>
+            <td>
+              {{ req.recipient_email }}
+              {% if req.recipient_name %}
+              <br><small class="has-text-grey">{{ req.recipient_name }}</small>
+              {% endif %}
+            </td>
+            <td>{{ req.purpose }}</td>
+            <td>
+              {% if req.status == "pending" %}
+                <span class="tag is-warning">En attente</span>
+              {% elsif req.status == "deposited" %}
+                <span class="tag is-info">Déposé</span>
+              {% elsif req.status == "viewed" %}
+                <span class="tag is-success">Consulté</span>
+              {% elsif req.status == "downloaded" %}
+                <span class="tag is-primary">Téléchargé</span>
+              {% elsif req.status == "purged" %}
+                <span class="tag is-light">Purgé</span>
+              {% else %}
+                <span class="tag">{{ req.status }}</span>
+              {% endif %}
+            </td>
+            <td>{{ req.expires_at }}</td>
+            <td>
+              <a class="button is-small is-outlined" href="/demandes/{{ req.id }}">Voir</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="box has-text-centered py-6">
+      <p class="is-size-5 has-text-grey mb-4">Aucune demande pour le moment.</p>
+      <a class="button is-primary" href="/demandes/nouvelle">Créer votre première demande</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock content %}
